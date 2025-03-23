@@ -9,7 +9,7 @@ use crate::function::Function;
 use crate::state::{LuaGuard, RawLua};
 use crate::traits::{FromLua, FromLuaMulti, IntoLua, IntoLuaMulti, ObjectLike};
 use crate::types::{Integer, LuaType, ValueRef};
-use crate::util::{assert_stack, check_stack, get_metatable_ptr, StackGuard};
+use crate::util::{StackGuard, assert_stack, check_stack, get_metatable_ptr};
 use crate::value::{Nil, Value};
 
 #[cfg(feature = "async")]
@@ -511,13 +511,6 @@ impl Table {
         }
     }
 
-    #[doc(hidden)]
-    #[deprecated(since = "0.10.0", note = "please use `metatable` instead")]
-    #[cfg(not(tarpaulin_include))]
-    pub fn get_metatable(&self) -> Option<Table> {
-        self.metatable()
-    }
-
     /// Sets or removes the metatable of this table.
     ///
     /// If `metatable` is `None`, the metatable is removed (if no metatable is set, this does
@@ -1014,7 +1007,7 @@ impl Serialize for SerializableTable<'_> {
     where
         S: Serializer,
     {
-        use crate::serde::de::{check_value_for_skip, MapPairs, RecursionGuard};
+        use crate::serde::de::{MapPairs, RecursionGuard, check_value_for_skip};
         use crate::value::SerializableValue;
 
         let convert_result = |res: Result<()>, serialize_err: Option<S::Error>| match res {

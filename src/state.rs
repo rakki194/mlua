@@ -25,7 +25,7 @@ use crate::types::{
 };
 use crate::userdata::{AnyUserData, UserData, UserDataProxy, UserDataRegistry, UserDataStorage};
 use crate::util::{
-    assert_stack, check_stack, protect_lua_closure, push_string, push_table, rawset_field, StackGuard,
+    StackGuard, assert_stack, check_stack, protect_lua_closure, push_string, push_table, rawset_field,
 };
 use crate::value::{Nil, Value};
 
@@ -46,7 +46,7 @@ use serde::Serialize;
 
 pub(crate) use extra::ExtraData;
 pub use raw::RawLua;
-use util::{callback_error_ext, StateGuard};
+use util::{StateGuard, callback_error_ext};
 
 /// Top level Lua struct which represents an instance of Lua VM.
 #[derive(Clone)]
@@ -324,12 +324,6 @@ impl Lua {
         protect_lua_closure::<_, ()>(state, nargs, ffi::LUA_MULTRET, f)?;
         let nresults = ffi::lua_gettop(state) - stack_start;
         R::from_stack_multi(nresults, &lua)
-    }
-
-    #[doc(hidden)]
-    #[deprecated(since = "0.10.0", note = "please use `load_std_libs` instead")]
-    pub fn load_from_std_lib(&self, libs: StdLib) -> Result<()> {
-        self.load_std_libs(libs)
     }
 
     /// Loads the specified subset of the standard libraries into an existing Lua state.
@@ -1554,11 +1548,7 @@ impl Lua {
                 lua.push_value(&v)?;
                 let mut isint = 0;
                 let i = ffi::lua_tointegerx(state, -1, &mut isint);
-                if isint == 0 {
-                    None
-                } else {
-                    Some(i)
-                }
+                if isint == 0 { None } else { Some(i) }
             },
         })
     }
@@ -1580,11 +1570,7 @@ impl Lua {
                 lua.push_value(&v)?;
                 let mut isnum = 0;
                 let n = ffi::lua_tonumberx(state, -1, &mut isnum);
-                if isnum == 0 {
-                    None
-                } else {
-                    Some(n)
-                }
+                if isnum == 0 { None } else { Some(n) }
             },
         })
     }

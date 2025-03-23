@@ -12,7 +12,7 @@ use crate::string::String;
 use crate::table::{Table, TablePairs};
 use crate::traits::{FromLua, FromLuaMulti, IntoLua, IntoLuaMulti};
 use crate::types::{MaybeSend, ValueRef};
-use crate::util::{check_stack, get_userdata, push_string, take_userdata, StackGuard};
+use crate::util::{StackGuard, check_stack, get_userdata, push_string, take_userdata};
 use crate::value::Value;
 
 #[cfg(feature = "async")]
@@ -30,7 +30,7 @@ pub use r#ref::{UserDataRef, UserDataRefMut};
 pub use registry::UserDataRegistry;
 pub(crate) use registry::{RawUserDataRegistry, UserDataProxy};
 pub(crate) use util::{
-    borrow_userdata_scoped, borrow_userdata_scoped_mut, init_userdata_metatable, TypeIdHints,
+    TypeIdHints, borrow_userdata_scoped, borrow_userdata_scoped_mut, init_userdata_metatable,
 };
 
 /// Kinds of metamethods that can be overridden.
@@ -893,12 +893,6 @@ impl AnyUserData {
     #[inline]
     pub fn metatable(&self) -> Result<UserDataMetatable> {
         self.raw_metatable().map(UserDataMetatable)
-    }
-
-    #[doc(hidden)]
-    #[deprecated(since = "0.10.0", note = "please use `metatable` instead")]
-    pub fn get_metatable(&self) -> Result<UserDataMetatable> {
-        self.metatable()
     }
 
     fn raw_metatable(&self) -> Result<Table> {
